@@ -3,19 +3,25 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
+
 contract GateKeeper is ERC1155 {
     mapping(uint256 => address) public roomOwners;
-    mapping(int256 => address) public roomIds;
+    mapping(uint256 => int256) public roomIds;
+    mapping(int256 => uint256) public IdsOfRooms;
+
 
     mapping(address => int256) public idOfUsers;
     mapping(int256 => address) public addressOfUsers;
 
-    uint256 public nbRooms;
+    uint256 public nbRooms = 1;
 
     constructor() ERC1155("") {}
 
-    function createRoom(uint256 _supply) public {
+    function createRoom(int256 _roomId, uint256 _supply) public {
+        require(IdsOfRooms[_roomId] == 0);
         roomOwners[nbRooms] = msg.sender;
+        roomIds[nbRooms] = _roomId;
+        IdsOfRooms[_roomId] = nbRooms;
         _mint(msg.sender, nbRooms, _supply, "");
         nbRooms++;
     }
@@ -39,6 +45,10 @@ contract GateKeeper is ERC1155 {
     function unregister() public {
         addressOfUsers[idOfUsers[msg.sender]] = address(0);
         idOfUsers[msg.sender] = 0;
+    }
+
+    function isGateOpen(int256 _userId, int256 _chatId) public view returns (bool) {
+        return (this.balanceOf(addressOfUsers[_userId], IdsOfRooms[_chatId] > 0 && addressOfUsers[_userId] != address(0));
     }
 
 }
