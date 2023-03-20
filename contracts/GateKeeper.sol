@@ -1,34 +1,44 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-// Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
-contract Lock {
-    uint public unlockTime;
-    address payable public owner;
+contract GateKeeper is ERC1155 {
+    mapping(uint256 => address) public roomOwners;
+    mapping(int256 => address) public roomIds;
 
-    event Withdrawal(uint amount, uint when);
+    mapping(address => int256) public idOfUsers;
+    mapping(int256 => address) public addressOfUsers;
 
-    constructor(uint _unlockTime) payable {
-        require(
-            block.timestamp < _unlockTime,
-            "Unlock time should be in the future"
-        );
+    uint256 public nbRooms;
 
-        unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+    constructor() ERC1155("") {}
+
+    function createRoom(uint256 _supply) public {
+        roomOwners[nbRooms] = msg.sender;
+        _mint(msg.sender, nbRooms, _supply, "");
+        nbRooms++;
     }
 
-    function withdraw() public {
-        // Uncomment this line, and the import of "hardhat/console.sol", to print a log in your terminal
-        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
-
-        require(block.timestamp >= unlockTime, "You can't withdraw yet");
-        require(msg.sender == owner, "You aren't the owner");
-
-        emit Withdrawal(address(this).balance, block.timestamp);
-
-        owner.transfer(address(this).balance);
+    function mint(uint256 _roomId, uint256 _quantity) public {
+        require(msg.sender == roomOwners[_roomId], "Not owner");
+        _mint(msg.sender, nbRooms, _quantity, "");
     }
+
+    function transferRoomOwnership(uint256 _roomId, address _newOwner) public {
+        require(msg.sender == roomOwners[_roomId], "Not owner");
+        roomOwners[_roomId] = _newOwner;
+    }
+
+    function register(int256 _userId) public {
+        require(addressOfUsers[_userId] == address(0), "Already taken");
+        addressOfUsers[_userId] = msg.sender;
+        idOfUsers[msg.sender] = _userId;
+    }
+
+    function unregister() public {
+        addressOfUsers[idOfUsers[msg.sender]] = address(0);
+        idOfUsers[msg.sender] = 0;
+    }
+
 }
