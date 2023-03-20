@@ -1,0 +1,27 @@
+{
+  "name": "telegramer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/verynifty/telegramer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/verynifty/telegramer/issues"
+  },
+  "homepage": "https://github.com/verynifty/telegramer#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.2",
+    "telegraf": "^4.12.2"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "hardhat": "^2.13.0"
+  }
+}
