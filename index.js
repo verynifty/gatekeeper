@@ -78,7 +78,7 @@ createRoom.on(message("text"), async ctx => {
         await ctx.reply(`
         Ok, follow the following link and execute the transaction to register this channel with a starting supply of ${supply}.
         
-https://arbitrum.ethcmd.com/   ${data}`);
+https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}`);
     } else {
         await ctx.reply(`
         this doesn't look like a valid number. Start again the process.`);
