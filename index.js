@@ -1,6 +1,19 @@
-const { Telegraf } = require('telegraf')
+const { Telegraf, Scenes, session } = require('telegraf')
+const { message } = require("telegraf/filters");
+
+const { ethers } = require("ethers");
+
+// const web3 = new ethers.providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc");
+
+const web3 = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
+
+GK_ADDRESS = "0x065886F25c2c6273A0365d0cBE43A17E75b6C9C9";
+GK_ABI = require('./GATEKEEPER_ABI.json');
+
+const gk_iface = new ethers.utils.Interface(GK_ABI);
 
 const bot = new Telegraf("6153080757:AAH-FYsprOXth86Is4I-pbB1Gi7o4eLIEDY");
+bot.use(session());
 
 function getGroups() {
     return ([
@@ -16,6 +29,10 @@ async function getRoom(chatId) {
 
 function isTgAdmin(userInfo) {
     return (userInfo.status === 'creator' || userInfo.status === 'administrator');
+}
+
+function isUserRegister(userId) {
+
 }
 
 async function onGateKeep(ctx) {
@@ -40,13 +57,37 @@ async function onGateKeep(ctx) {
             ctx.sendMessage(`
             I need to be an admin in this group to work.
         `)
+            return;
         }
+        ctx.scene.enter("createRoom")
+
     }
 }
 
-bot.start((ctx) => ctx.reply('Welcome'));
-bot.help((ctx) => ctx.reply('Send me a sticker'));
-console.log(bot)
+const createRoom = new Scenes.BaseScene("createRoom");
+createRoom.enter(ctx => ctx.reply(`Looks like we are ready to gatekeep this channel 🫡
+
+You'll need to make a transaction in order to register this group. How many pass do you want to mint? (Don't worry you can mint more later).
+`));
+createRoom.on(message("text"), async ctx => {
+    // validate
+    let supply = ctx.message.text;
+    let chatId = ctx.message.chat.id;
+    if (parseInt(supply) > 0) {
+        let data = gk_iface.encodeFunctionData("createRoom", [chatId, supply])
+        await ctx.reply(`
+        Ok, follow the following link and execute the transaction to register this channel with a starting supply of ${supply}.
+        
+https://arbitrum.ethcmd.com/   ${data}`);
+    } else {
+        await ctx.reply(`
+        this doesn't look like a valid number. Start again the process.`);
+    }
+    return ctx.scene.leave();
+});
+
+const stage = new Scenes.Stage([createRoom]);
+bot.use(stage.middleware());
 
 bot.command('/gatekeep', async (ctx) => {
 

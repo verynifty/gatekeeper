@@ -9,13 +9,12 @@ contract GateKeeper is ERC1155 {
     mapping(uint256 => int256) public roomIds;
     mapping(int256 => uint256) public IdsOfRooms;
 
-
     mapping(address => int256) public idOfUsers;
     mapping(int256 => address) public addressOfUsers;
 
     uint256 public nbRooms = 1;
 
-    constructor() ERC1155("") {}
+    constructor() ERC1155("ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/") {}
 
     function createRoom(int256 _roomId, uint256 _supply) public {
         require(IdsOfRooms[_roomId] == 0);
@@ -48,7 +47,7 @@ contract GateKeeper is ERC1155 {
     }
 
     function isGateOpen(int256 _userId, int256 _chatId) public view returns (bool) {
-        return (this.balanceOf(addressOfUsers[_userId], IdsOfRooms[_chatId] > 0 && addressOfUsers[_userId] != address(0));
+        return (this.balanceOf(addressOfUsers[_userId], IdsOfRooms[_chatId]) > 0 && addressOfUsers[_userId] != address(0));
     }
 
 }
