@@ -34,8 +34,13 @@ function isTgAdmin(userInfo) {
     return (userInfo.status === 'creator' || userInfo.status === 'administrator');
 }
 
-function isUserRegister(userId) {
+async function getAddressOfUser(userId) {
+    let address = await GK.addressOfUsers(userId);
+    return address;
+}
 
+async function isUserRegister(userId) {
+    return getAddressOfUser(userId) != "0x0000000000000000000000000000000000000000"
 }
 
 
@@ -134,14 +139,28 @@ bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
     console.log("HELLO")
+    const fromId = ctx.update.message.from.id;
+    let address = await getAddressOfUser(fromId)
+    if (address == "0x0000000000000000000000000000000000000000") {
+        let data = gk_iface.encodeFunctionData("register", [fromId])
+        ctx.sendMessage(`
+Welcome to GateKeeper
+To link your address to your Telegram account, visit this link and send the transaction with the address you want to use:
+
+https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
+`)
+    } else {
+        ctx.sendMessage(`
+        You are registered with the address: ${address}.
+        `)
+    }
+    console.log(ctx)
 })
 
 bot.on('message', async (ctx) => {
     const chatId = ctx.update.message.chat.id;
     const botId = ctx.botInfo.id;
     if (ctx.update.message.chat.type == "group") {
-
-
         // check if it's a new member. If yes we check if he is allowed to be in the group or not
         if (ctx.update.message.new_chat_member != null && ctx.update.message.chat.type == "group") {
             const userId = ctx.update.message.new_chat_member.id;
