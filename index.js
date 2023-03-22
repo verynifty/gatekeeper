@@ -10,9 +10,12 @@ const web3 = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_goer
 GK_ADDRESS = "0x065886F25c2c6273A0365d0cBE43A17E75b6C9C9";
 GK_ABI = require('./GATEKEEPER_ABI.json');
 
+const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
+
 const gk_iface = new ethers.utils.Interface(GK_ABI);
 
 const bot = new Telegraf("6153080757:AAH-FYsprOXth86Is4I-pbB1Gi7o4eLIEDY");
+console.log(bot.telegram)
 bot.use(session());
 
 function getGroups() {
@@ -34,6 +37,8 @@ function isTgAdmin(userInfo) {
 function isUserRegister(userId) {
 
 }
+
+
 
 async function onGateKeep(ctx) {
     console.log(ctx)
@@ -64,6 +69,44 @@ async function onGateKeep(ctx) {
     }
 }
 
+async function onFlushRoom(ctx) {
+
+    let chatId = ctx.message.chat.id;
+
+    let members = await ctx.getChat(chatId);
+    console.log(members)
+}
+
+async function setAddressRights(roomId, chatId, address, revoke_messages = false, notify = false) {
+    let tgId = await GK.idOfUsers(address);
+    if (parseInt(tgId) != 0) {
+        let userBalance = await GK.balanceOf(from, roomId);
+        if (parseInt(senderBalance.toString()) == 0) {
+            bot.telegram.sendMessage(chatId.toString(), `🔨 ${from} is now banned`);
+            bot.telegram.banChatMember(chatId, tgId, {
+                chat_id: chatId,
+                revoke_messages: true
+            })
+        } else {
+            bot.telegram.unbanChatMember(chatId, tgId, {
+                chat_id: chatId,
+                revoke_messages: true
+            })
+        }
+    } else {
+        console.log("User not registered.")
+    }
+}
+
+GK.on("TransferSingle", async (operator, from, to, id, amount) => {
+    console.log("NEW TRANSFER")
+    console.log(operator, from, to, id.toString(), amount.toString());
+    let chatId = await GK.roomIds(id);
+    await bot.telegram.sendMessage(chatId.toString(), `✉️ ${amount.toString()} pass was transferred from ${from} to ${to}.`);
+    setAddressRights(id, chatId, from, false, true)
+    setAddressRights(id, chatId, to, false, true)
+})
+
 const createRoom = new Scenes.BaseScene("createRoom");
 createRoom.enter(ctx => ctx.reply(`Looks like we are ready to gatekeep this channel 🫡
 
@@ -89,31 +132,36 @@ https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}`);
 const stage = new Scenes.Stage([createRoom]);
 bot.use(stage.middleware());
 
-bot.command('/gatekeep', async (ctx) => {
-
+bot.start(async (ctx) => {
+    console.log("HELLO")
 })
 
 bot.on('message', async (ctx) => {
     const chatId = ctx.update.message.chat.id;
     const botId = ctx.botInfo.id;
-    // check if it's a new member. If yes we check if he is allowed to be in the group or not
-    if (ctx.update.message.new_chat_member != null && ctx.update.message.chat.type == "group") {
-        const userId = ctx.update.message.new_chat_member.id;
-        // check if we control this group
-        console.log(userId, "joined the chat", chatId)
-        // web3 call here
-        // ban if not whitelisted
-        if (false) {
-            console.log("Bann user", userId, chatId)
-            ctx.banChatMember(userId, 0, {
-                chat_id: chatId,
-                revoke_messages: true
-            })
-        }
-    }
+    if (ctx.update.message.chat.type == "group") {
 
-    if (ctx.update.message.chat.type == "group" && ctx.update.message.text == '/gatekeep') {
-        await onGateKeep(ctx);
+
+        // check if it's a new member. If yes we check if he is allowed to be in the group or not
+        if (ctx.update.message.new_chat_member != null && ctx.update.message.chat.type == "group") {
+            const userId = ctx.update.message.new_chat_member.id;
+            // check if we control this group
+            console.log(userId, "joined the chat", chatId)
+            // web3 call here
+            // ban if not whitelisted
+            if (false) {
+                console.log("Bann user", userId, chatId)
+                ctx.banChatMember(userId, 0, {
+                    chat_id: chatId,
+                    revoke_messages: true
+                })
+            }
+        }
+        if (ctx.update.message.chat.type == "group" && ctx.update.message.text == '/gatekeep') {
+            await onGateKeep(ctx);
+        } else if (ctx.update.message.chat.type == "group" && ctx.update.message.text == '/flush') {
+            await onFlushRoom(ctx);
+        }
     }
 })
 
