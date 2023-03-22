@@ -7,7 +7,7 @@ const { ethers } = require("ethers");
 
 const web3 = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
 
-GK_ADDRESS = "0x065886F25c2c6273A0365d0cBE43A17E75b6C9C9";
+GK_ADDRESS = "0x6C32b170a947d390fA1903a09BDAc7ED3C6495cf";
 GK_ABI = require('./GATEKEEPER_ABI.json');
 
 const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
@@ -85,9 +85,9 @@ async function onFlushRoom(ctx) {
 async function setAddressRights(roomId, chatId, address, revoke_messages = false, notify = false) {
     let tgId = await GK.idOfUsers(address);
     if (parseInt(tgId) != 0) {
-        let userBalance = await GK.balanceOf(from, roomId);
+        let userBalance = await GK.balanceOf(address, roomId);
         if (parseInt(senderBalance.toString()) == 0) {
-            bot.telegram.sendMessage(chatId.toString(), `🔨 ${from} is now banned`);
+            bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
             bot.telegram.banChatMember(chatId, tgId, {
                 chat_id: chatId,
                 revoke_messages: true
@@ -153,23 +153,30 @@ https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
         let nbChannels = await GK.nbRooms();
         let rooms = [];
         let addresses = [];
-        for (let index = 1; index < nbChannels; index++) {
+        for (let index = 1; index <= nbChannels; index++) {
            rooms.push(index);
            addresses.push(address);
         }
         let balances = await GK.balanceOfBatch(addresses, rooms);
-        for (let index = 0; index < nbChannels - 1; index++) {
+        console.log(balances)
+        let channels = 0;
+        channelList = `
+You have access to the following channels:
+`
+        for (let index = 0; index < nbChannels; index++) {
             if (parseInt(balances[index].toString()) > 0) {
                 let chatId = await GK.roomIds(index + 1);
+                channels++;
                 console.log(chatId)
+                channelList += "* " + chatId
             }
          }
         ctx.sendMessage(`
         You are registered with the address: ${address}.
 
+        ${channelList}
         `)
     }
-    console.log(ctx)
 })
 
 bot.on('message', async (ctx) => {

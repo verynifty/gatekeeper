@@ -65,7 +65,6 @@
        url: `https://goerli.infura.io/v3/${process.env.INFURA}`,
        // accounts: [process.env.KEY],
        accounts: [process.env.KEY],
-       gasPrice: 100000000000,
      },
    },
    etherscan: {

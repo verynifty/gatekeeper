@@ -13,9 +13,9 @@ contract GateKeeper is ERC1155 {
     mapping(address => int256) public idOfUsers;
     mapping(int256 => address) public addressOfUsers;
 
-    uint256 public nbRooms = 1;
+    uint256 public nbRooms = 0;
 
-    constructor() ERC1155("ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/") {}
+    constructor() ERC1155("https://ipfs.io/ipfs/QmWXJXRdExse2YHRY21Wvh4pjRxNRQcWVhcKw4DLVnqGqs/") {}
 
     function createRoom(int256 _roomId, uint256 _supply) public {
         require(IdsOfRooms[_roomId] == 0);
