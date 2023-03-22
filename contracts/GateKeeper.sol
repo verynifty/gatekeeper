@@ -9,7 +9,6 @@ contract GateKeeper is ERC1155 {
 
     mapping(uint256 => int256) public roomIds;
     mapping(int256 => uint256) public IdsOfRooms;
-    mapping(uint256 => string) public roomName;
 
     mapping(address => int256) public idOfUsers;
     mapping(int256 => address) public addressOfUsers;
@@ -18,14 +17,13 @@ contract GateKeeper is ERC1155 {
 
     constructor() ERC1155("ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/") {}
 
-    function createRoom(int256 _roomId, uint256 _supply, string calldata _roomName) public {
+    function createRoom(int256 _roomId, uint256 _supply) public {
         require(IdsOfRooms[_roomId] == 0);
+        nbRooms++;
         roomOwners[nbRooms] = msg.sender;
         roomIds[nbRooms] = _roomId;
-        roomName[nbRooms] = _roomName;
         IdsOfRooms[_roomId] = nbRooms;
         _mint(msg.sender, nbRooms, _supply, "");
-        nbRooms++;
     }
 
     function mint(uint256 _roomId, uint256 _quantity) public {

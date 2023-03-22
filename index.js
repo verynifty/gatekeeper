@@ -150,8 +150,23 @@ To link your address to your Telegram account, visit this link and send the tran
 https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
 `)
     } else {
+        let nbChannels = await GK.nbRooms();
+        let rooms = [];
+        let addresses = [];
+        for (let index = 1; index < nbChannels; index++) {
+           rooms.push(index);
+           addresses.push(address);
+        }
+        let balances = await GK.balanceOfBatch(addresses, rooms);
+        for (let index = 0; index < nbChannels - 1; index++) {
+            if (parseInt(balances[index].toString()) > 0) {
+                let chatId = await GK.roomIds(index + 1);
+                console.log(chatId)
+            }
+         }
         ctx.sendMessage(`
         You are registered with the address: ${address}.
+
         `)
     }
     console.log(ctx)
