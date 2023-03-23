@@ -14,7 +14,7 @@ const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
 
 const gk_iface = new ethers.utils.Interface(GK_ABI);
 
-const bot = new Telegraf("6153080757:AAH-FYsprOXth86Is4I-pbB1Gi7o4eLIEDY");
+const bot = new Telegraf("6079845096:AAHgT6EL8wYhzeTIJdEJdmvHlkZvCDsIXc4");
 console.log(bot.telegram)
 bot.use(session());
 
@@ -95,7 +95,6 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
         } else {
             bot.telegram.unbanChatMember(chatId, tgId, {
                 chat_id: chatId,
-                revoke_messages: true
             })
         }
     } else {
@@ -168,7 +167,10 @@ You have access to the following channels:
                 let chatId = await GK.roomIds(index + 1);
                 channels++;
                 console.log(chatId)
-                channelList += "* " + chatId
+                let chatInfo = await bot.telegram.getChat(chatId.toString())
+                let chatInvite = await bot.telegram.createChatInviteLink(chatId.toString())
+                channelList += (index + 1) + ". " + chatInfo.title + " - " + chatInvite.invite_link;
+               
             }
          }
         ctx.sendMessage(`
@@ -182,7 +184,7 @@ You have access to the following channels:
 bot.on('message', async (ctx) => {
     const chatId = ctx.update.message.chat.id;
     const botId = ctx.botInfo.id;
-    if (ctx.update.message.chat.type == "group") {
+    if (ctx.update.message.chat.type == "group" || ctx.update.message.chat.type == "supergroup") {
         // check if it's a new member. If yes we check if he is allowed to be in the group or not
         if (ctx.update.message.new_chat_member != null && ctx.update.message.chat.type == "group") {
             const userId = ctx.update.message.new_chat_member.id;
@@ -198,9 +200,9 @@ bot.on('message', async (ctx) => {
                 })
             }
         }
-        if (ctx.update.message.chat.type == "group" && ctx.update.message.text == '/gatekeep') {
+        if (ctx.update.message.text == '/gatekeep') {
             await onGateKeep(ctx);
-        } else if (ctx.update.message.chat.type == "group" && ctx.update.message.text == '/flush') {
+        } else if (ctx.update.message.text == '/flush') {
             await onFlushRoom(ctx);
         }
     }
