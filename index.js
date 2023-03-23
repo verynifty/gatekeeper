@@ -18,18 +18,6 @@ const bot = new Telegraf("6079845096:AAHgT6EL8wYhzeTIJdEJdmvHlkZvCDsIXc4");
 console.log(bot.telegram)
 bot.use(session());
 
-function getGroups() {
-    return ([
-        {
-            id: "chatId"
-        }
-    ])
-}
-
-async function getRoom(chatId) {
-    return null;
-}
-
 function isTgAdmin(userInfo) {
     return (userInfo.status === 'creator' || userInfo.status === 'administrator');
 }
@@ -42,8 +30,6 @@ async function getAddressOfUser(userId) {
 async function isUserRegister(userId) {
     return getAddressOfUser(userId) != "0x0000000000000000000000000000000000000000"
 }
-
-
 
 async function onGateKeep(ctx) {
     console.log(ctx)
@@ -83,9 +69,7 @@ async function onGateKeep(ctx) {
 }
 
 async function onFlushRoom(ctx) {
-
     let chatId = ctx.message.chat.id;
-
     let members = await ctx.getChat(chatId);
     console.log(members)
 }
