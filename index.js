@@ -7,7 +7,7 @@ const { ethers } = require("ethers");
 
 const web3 = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
 
-GK_ADDRESS = "0x6C32b170a947d390fA1903a09BDAc7ED3C6495cf";
+GK_ADDRESS = "0xca9e6390D988d868e2655525EEcf5Eb7000F0419";
 GK_ABI = require('./GATEKEEPER_ABI.json');
 
 const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
