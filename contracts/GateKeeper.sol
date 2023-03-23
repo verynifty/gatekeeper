@@ -51,4 +51,5 @@ contract GateKeeper is ERC1155 {
         return (this.balanceOf(addressOfUsers[_userId], IdsOfRooms[_chatId]) > 0 && addressOfUsers[_userId] != address(0));
     }
 
+
 }

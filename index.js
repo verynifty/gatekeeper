@@ -62,6 +62,12 @@ async function onGateKeep(ctx) {
             `);
             return;
         }
+        if (ctx.update.message.chat.type != "supergroup") {
+            ctx.sendMessage(`
+            You'll first need to set the group to public then change it back to private.
+        `)
+            return;
+        }
         let botInfo = await ctx.getChatMember(botId)
         if (!isTgAdmin(botInfo)) {
             ctx.sendMessage(`
@@ -69,6 +75,8 @@ async function onGateKeep(ctx) {
         `)
             return;
         }
+     
+       
         ctx.scene.enter("createRoom")
 
     }
@@ -86,7 +94,7 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
     let tgId = await GK.idOfUsers(address);
     if (parseInt(tgId) != 0) {
         let userBalance = await GK.balanceOf(address, roomId);
-        if (parseInt(senderBalance.toString()) == 0) {
+        if (parseInt(userBalance.toString()) == 0) {
             bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
             bot.telegram.banChatMember(chatId, tgId, {
                 chat_id: chatId,
@@ -168,8 +176,13 @@ You have access to the following channels:
                 channels++;
                 console.log(chatId)
                 let chatInfo = await bot.telegram.getChat(chatId.toString())
-                let chatInvite = await bot.telegram.createChatInviteLink(chatId.toString())
-                channelList += (index + 1) + ". " + chatInfo.title + " - " + chatInvite.invite_link;
+                try {
+                    let chatInvite = await bot.telegram.createChatInviteLink(chatId.toString())
+                    channelList += (index + 1) + ". " + chatInfo.title + " - " + chatInvite.invite_link;
+                } catch (error) {
+                    
+                }
+               
                
             }
          }
