@@ -2,9 +2,9 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-
-contract GateKeeper is ERC1155 {
+contract GateKeeper is ERC1155, Ownable {
     mapping(uint128 => address) public roomOwners;
 
     mapping(uint128 => int128) public roomIds;
