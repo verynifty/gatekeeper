@@ -109,6 +109,34 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
     }
 }
 
+async function setAddressRightsForTGID(roomId, chatId, tgId, revoke_messages = false, notify = false) {
+    if (parseInt(tgId) != 0) {
+        let userBalance = await GK.balanceOf(address, roomId);
+        if (parseInt(userBalance.toString()) == 0) {
+            try {
+                await bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
+                await bot.telegram.banChatMember(chatId, tgId, {
+                    chat_id: chatId,
+                    revoke_messages: true
+                })
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            try {
+                await bot.telegram.unbanChatMember(chatId, tgId, {
+                    chat_id: chatId,
+                })
+            } catch (error) {
+                console.log(error)
+            }
+
+        }
+    } else {
+        console.log("User not registered.")
+    }
+}
+
 GK.on("TransferSingle", async (operator, from, to, id, amount) => {
     console.log("NEW TRANSFER")
     console.log(operator, from, to, id.toString(), amount.toString());
@@ -160,6 +188,8 @@ Welcome to GateKeeper
 To link your address to your Telegram account, visit this link and send the transaction with the address you want to use:
 
 https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
+
+By registering, you'll receive an NFT that will allow you to access the main Gate channel.
 `)
     } else {
         let nbChannels = await GK.nbRooms();
@@ -204,7 +234,7 @@ bot.on('message', async (ctx) => {
     const botId = ctx.botInfo.id;
     if (ctx.update.message.chat.type == "group" || ctx.update.message.chat.type == "supergroup") {
         // check if it's a new member. If yes we check if he is allowed to be in the group or not
-        if (ctx.update.message.new_chat_member != null && ctx.update.message.chat.type == "group") {
+        if (ctx.update.message.new_chat_member != null) {
             const userId = ctx.update.message.new_chat_member.id;
             // check if we control this group
             console.log(userId, "joined the chat", chatId)
