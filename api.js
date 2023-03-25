@@ -12,7 +12,7 @@ require("dotenv").config();
 const web3 = new ethers.providers.JsonRpcProvider(process.env.RPC);
 
 GK_ADDRESS = process.env_CONTRACT_ADDRESS;
-GK_ABI = require('./GATEKEEPER_ABI.json');
+GK_ABI = require('../GATEKEEPER_ABI.json');
 
 const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
 
