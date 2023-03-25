@@ -82,7 +82,7 @@ async function onFlushRoom(ctx) {
 
 async function setAddressRights(roomId, chatId, address, revoke_messages = false, notify = false) {
     let tgId = await GK.idOfUsers(address);
-    if (parseInt(tgId) != 0) {
+    if (parseInt(tgId.toString()) != 0) {
         let userBalance = await GK.balanceOf(address, roomId);
         if (parseInt(userBalance.toString()) == 0) {
             bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
@@ -103,10 +103,12 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
 GK.on("TransferSingle", async (operator, from, to, id, amount) => {
     console.log("NEW TRANSFER")
     console.log(operator, from, to, id.toString(), amount.toString());
-    let chatId = await GK.roomIds(id);
-    await bot.telegram.sendMessage(chatId.toString(), `✉️ ${amount.toString()} pass was transferred from ${from} to ${to}.`);
-    setAddressRights(id, chatId, from, false, true)
-    setAddressRights(id, chatId, to, false, true)
+    setTimeout(async () => {
+        let chatId = await GK.roomIds(id);
+        await bot.telegram.sendMessage(chatId.toString(), `✉️ ${amount.toString()} pass was transferred from ${from} to ${to}.`);
+        setAddressRights(id, chatId, from, false, true)
+        setAddressRights(id, chatId, to, false, true)
+    }, 5000);
 })
 
 const createRoom = new Scenes.BaseScene("createRoom");
