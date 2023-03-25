@@ -100,6 +100,7 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
             try {
                 await bot.telegram.unbanChatMember(chatId.toString(), tgId.toString(), {
                     chat_id: chatId,
+                    only_if_banned: true
                 })
             } catch (error) {
                 console.log(error)
