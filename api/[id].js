@@ -14,6 +14,10 @@ const GK_ADDRESS = process.env_CONTRACT_ADDRESS;
 const GK_ABI = require('../GATEKEEPER_ABI.json');
 
 const GK = new ethers.Contract(process.env.CONTRACT_ADDRESS, GK_ABI, web3);
+
+const bot = new Telegraf(process.env.TELEGRAM);
+
+
 export default async function handler(req, res) {
     res.statusCode = 200;
     const id = req.query.id;
