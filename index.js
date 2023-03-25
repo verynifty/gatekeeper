@@ -19,6 +19,10 @@ const gk_iface = new ethers.utils.Interface(GK_ABI);
 const bot = new Telegraf(process.env.TELEGRAM);
 bot.use(session());
 
+bot.telegram.unbanChatMember(-1001593103753, 1340829180, {
+    chat_id: -1001593103753,
+})
+
 function isTgAdmin(userInfo) {
     return (userInfo.status === 'creator' || userInfo.status === 'administrator');
 }
@@ -86,17 +90,19 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
         let userBalance = await GK.balanceOf(address, roomId);
         if (parseInt(userBalance.toString()) == 0) {
             try {
+                /*
                 await bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
                 await bot.telegram.banChatMember(chatId, tgId.toString(), {
                     chat_id: chatId,
                     revoke_messages: true
                 })
+                */
             } catch (error) {
                 console.log(error)
             }
         } else {
             try {
-                await bot.telegram.unbanChatMember(chatId, tgId.toString(), {
+                await bot.telegram.unbanChatMember(chatId.toString(), tgId.toString(), {
                     chat_id: chatId,
                 })
             } catch (error) {
@@ -119,8 +125,8 @@ GK.on("TransferSingle", async (operator, from, to, id, amount) => {
         } catch (error) {
             console.log(error)
         }
-        setAddressRights(id, chatId.toString(), from, false, true)
-        setAddressRights(id, chatId.toString(), to, false, true)
+        // setAddressRights(id, chatId.toString(), from, false, true)
+        // setAddressRights(id, chatId.toString(), to, false, true)
     }, 5000);
 })
 
@@ -150,7 +156,6 @@ const stage = new Scenes.Stage([createRoom]);
 bot.use(stage.middleware());
 
 bot.start(async (ctx) => {
-    console.log("HELLO")
     const fromId = ctx.update.message.from.id;
     let address = await getAddressOfUser(fromId)
     if (address == "0x0000000000000000000000000000000000000000") {
@@ -167,6 +172,7 @@ Once your transaction is confirmed, execute again the start command to see the c
 `)
     } else {
         let nbChannels = await GK.nbRooms();
+        console.log(nbChannels.toString())
         let rooms = [];
         let addresses = [];
         for (let index = 1; index <= nbChannels; index++) {
@@ -185,9 +191,13 @@ You have access to the following channels:
                 channels++;
                 console.log(chatId)
                 let chatInfo = await bot.telegram.getChat(chatId.toString())
-                try {
+                let invite_link = chatInfo.invite_link;
+                if (invite_link == null) {
                     let chatInvite = await bot.telegram.createChatInviteLink(chatId.toString())
-                    channelList += (index + 1) + ". " + chatInfo.title + " - " + chatInvite.invite_link;
+                    invite_link = chatInvite.invite_link;
+                }
+                try {
+                    channelList += (index + 1) + ". " + chatInfo.title + " - " + invite_link;
                 } catch (error) {
 
                 }
@@ -207,6 +217,10 @@ bot.on('message', async (ctx) => {
     const chatId = ctx.update.message.chat.id;
     const botId = ctx.botInfo.id;
     if (ctx.update.message.chat.type == "group" || ctx.update.message.chat.type == "supergroup") {
+        if (ctx.update.message.text == '/gatekeep') {
+            await onGateKeep(ctx);
+            return;
+        }
         // check if it's a new member. If yes we check if he is allowed to be in the group or not
         let roomId = await GK.IdsOfRooms(chatId);
         if (parseInt(roomId.toString()) == 0) {
@@ -240,9 +254,7 @@ bot.on('message', async (ctx) => {
                
             }
         }
-        if (ctx.update.message.text == '/gatekeep') {
-            await onGateKeep(ctx);
-        }
+      
     }
 })
 
