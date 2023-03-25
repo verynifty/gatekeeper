@@ -228,7 +228,7 @@ bot.on('message', async (ctx) => {
             if (shouldBan) {
                 console.log("Bann user", userId, chatId)
                 try {
-                    ctx.banChatMember(userId, 0, {
+                    await ctx.banChatMember(userId, 0, {
                         chat_id: chatId,
                         revoke_messages: true
                     })
