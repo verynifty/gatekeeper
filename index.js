@@ -17,7 +17,6 @@ const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
 const gk_iface = new ethers.utils.Interface(GK_ABI);
 
 const bot = new Telegraf(process.env.TELEGRAM);
-console.log(bot.telegram)
 bot.use(session());
 
 function isTgAdmin(userInfo) {
@@ -67,8 +66,8 @@ async function onGateKeep(ctx) {
         `)
             return;
         }
-     
-       
+
+
         ctx.scene.enter("createRoom")
 
     }
@@ -82,18 +81,28 @@ async function onFlushRoom(ctx) {
 
 async function setAddressRights(roomId, chatId, address, revoke_messages = false, notify = false) {
     let tgId = await GK.idOfUsers(address);
+    console.log(tgId.toString())
     if (parseInt(tgId.toString()) != 0) {
         let userBalance = await GK.balanceOf(address, roomId);
         if (parseInt(userBalance.toString()) == 0) {
-            bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
-            bot.telegram.banChatMember(chatId, tgId, {
-                chat_id: chatId,
-                revoke_messages: true
-            })
+            try {
+                await bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
+                await bot.telegram.banChatMember(chatId, tgId.toString(), {
+                    chat_id: chatId,
+                    revoke_messages: true
+                })
+            } catch (error) {
+                console.log(error)
+            }
         } else {
-            bot.telegram.unbanChatMember(chatId, tgId, {
-                chat_id: chatId,
-            })
+            try {
+                await bot.telegram.unbanChatMember(chatId, tgId.toString(), {
+                    chat_id: chatId,
+                })
+            } catch (error) {
+                console.log(error)
+            }
+
         }
     } else {
         console.log("User not registered.")
@@ -105,9 +114,13 @@ GK.on("TransferSingle", async (operator, from, to, id, amount) => {
     console.log(operator, from, to, id.toString(), amount.toString());
     setTimeout(async () => {
         let chatId = await GK.roomIds(id);
-        await bot.telegram.sendMessage(chatId.toString(), `✉️ ${amount.toString()} pass was transferred from ${from} to ${to}.`);
-        setAddressRights(id, chatId, from, false, true)
-        setAddressRights(id, chatId, to, false, true)
+        try {
+            await bot.telegram.sendMessage(chatId.toString(), `✉️ ${amount.toString()} pass was transferred from ${from} to ${to}.`);
+        } catch (error) {
+            console.log(error)
+        }
+        setAddressRights(id, chatId.toString(), from, false, true)
+        setAddressRights(id, chatId.toString(), to, false, true)
     }, 5000);
 })
 
@@ -153,8 +166,8 @@ https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
         let rooms = [];
         let addresses = [];
         for (let index = 1; index <= nbChannels; index++) {
-           rooms.push(index);
-           addresses.push(address);
+            rooms.push(index);
+            addresses.push(address);
         }
         let balances = await GK.balanceOfBatch(addresses, rooms);
         console.log(balances)
@@ -172,12 +185,12 @@ You have access to the following channels:
                     let chatInvite = await bot.telegram.createChatInviteLink(chatId.toString())
                     channelList += (index + 1) + ". " + chatInfo.title + " - " + chatInvite.invite_link;
                 } catch (error) {
-                    
+
                 }
-               
-               
+
+
             }
-         }
+        }
         ctx.sendMessage(`
         You are registered with the address: ${address}.
 
