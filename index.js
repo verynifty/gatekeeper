@@ -86,13 +86,13 @@ async function setAddressRights(roomId, chatId, address, revoke_messages = false
         let userBalance = await GK.balanceOf(address, roomId);
         if (parseInt(userBalance.toString()) == 0) {
             try {
-                /*
+                
                 await bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
                 await bot.telegram.banChatMember(chatId, tgId.toString(), {
                     chat_id: chatId,
                     revoke_messages: true
                 })
-                */
+                
             } catch (error) {
                 console.log(error)
             }
@@ -122,8 +122,8 @@ GK.on("TransferSingle", async (operator, from, to, id, amount) => {
         } catch (error) {
             console.log(error)
         }
-        // setAddressRights(id, chatId.toString(), from, false, true)
-        // setAddressRights(id, chatId.toString(), to, false, true)
+         setAddressRights(id, chatId.toString(), from, false, true)
+         setAddressRights(id, chatId.toString(), to, false, true)
     }, 5000);
 })
 
