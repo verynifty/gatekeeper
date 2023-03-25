@@ -122,8 +122,8 @@ GK.on("TransferSingle", async (operator, from, to, id, amount) => {
         } catch (error) {
             console.log(error)
         }
-         setAddressRights(id, chatId.toString(), from, false, true)
-         setAddressRights(id, chatId.toString(), to, false, true)
+       //  setAddressRights(id, chatId.toString(), from, false, true)
+       //  setAddressRights(id, chatId.toString(), to, false, true)
     }, 5000);
 })
 
