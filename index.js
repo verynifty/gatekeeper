@@ -9,7 +9,7 @@ require("dotenv").config();
 
 const web3 = new ethers.providers.JsonRpcProvider(process.env.RPC);
 
-GK_ADDRESS = process.env_CONTRACT_ADDRESS;
+GK_ADDRESS = process.env.CONTRACT_ADDRESS;
 GK_ABI = require('./GATEKEEPER_ABI.json');
 
 const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
@@ -31,6 +31,10 @@ async function getAddressOfUser(userId) {
 
 async function isUserRegister(userId) {
     return getAddressOfUser(userId) != "0x0000000000000000000000000000000000000000"
+}
+
+async function getRoom(chatId) {
+    return null;
 }
 
 async function onGateKeep(ctx) {
