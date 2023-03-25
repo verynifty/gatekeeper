@@ -3,18 +3,20 @@ const { message } = require("telegraf/filters");
 
 const { ethers } = require("ethers");
 
+require("dotenv").config();
+
 // const web3 = new ethers.providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc");
 
-const web3 = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/eth_goerli");
+const web3 = new ethers.providers.JsonRpcProvider(process.env.RPC);
 
-GK_ADDRESS = "0xca9e6390D988d868e2655525EEcf5Eb7000F0419";
+GK_ADDRESS = process.env_CONTRACT_ADDRESS;
 GK_ABI = require('./GATEKEEPER_ABI.json');
 
 const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
 
 const gk_iface = new ethers.utils.Interface(GK_ABI);
 
-const bot = new Telegraf("6079845096:AAHgT6EL8wYhzeTIJdEJdmvHlkZvCDsIXc4");
+const bot = new Telegraf(process.env.TELEGRAM);
 console.log(bot.telegram)
 bot.use(session());
 
