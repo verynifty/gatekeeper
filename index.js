@@ -19,10 +19,6 @@ const gk_iface = new ethers.utils.Interface(GK_ABI);
 const bot = new Telegraf(process.env.TELEGRAM);
 bot.use(session());
 
-bot.telegram.unbanChatMember(-1001593103753, 1340829180, {
-    chat_id: -1001593103753,
-})
-
 function isTgAdmin(userInfo) {
     return (userInfo.status === 'creator' || userInfo.status === 'administrator');
 }
