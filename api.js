@@ -4,5 +4,5 @@ const express = require('express');
 router.get('/:id', (req, res) => {
     const { id } = req.params;
     // do something with the id
-    res.send('Hello World');
+    res.json({id: id});
 };
