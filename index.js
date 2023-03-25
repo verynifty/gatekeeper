@@ -162,6 +162,8 @@ To link your address to your Telegram account, visit this link and send the tran
 https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
 
 By registering, you'll receive an NFT that will allow you to access the main Gate channel.
+
+Once your transaction is confirmed, execute again the start command to see the channels you have access to.
 `)
     } else {
         let nbChannels = await GK.nbRooms();
