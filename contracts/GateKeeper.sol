@@ -40,6 +40,7 @@ contract GateKeeper is ERC1155, Ownable {
         require(addressOfUsers[_userId] == address(0), "Already taken");
         addressOfUsers[_userId] = msg.sender;
         idOfUsers[msg.sender] = _userId;
+        _mint(msg.sender, 1, 1, "");
     }
 
     function unregister() public {
@@ -50,6 +51,5 @@ contract GateKeeper is ERC1155, Ownable {
     function isGateOpen(int128 _userId, int128 _chatId) public view returns (bool) {
         return (this.balanceOf(addressOfUsers[_userId], IdsOfRooms[_chatId]) > 0 && addressOfUsers[_userId] != address(0));
     }
-
 
 }
