@@ -81,25 +81,24 @@ async function onFlushRoom(ctx) {
 
 async function setAddressRights(roomId, chatId, address, revoke_messages = false, notify = false) {
     let tgId = await GK.idOfUsers(address);
-    console.log(tgId.toString())
     if (parseInt(tgId.toString()) != 0) {
         let userBalance = await GK.balanceOf(address, roomId);
+        console.log("blance: ", userBalance.toString());
         if (parseInt(userBalance.toString()) == 0) {
             try {
-                
+
                 await bot.telegram.sendMessage(chatId.toString(), `🔨 ${address} is now banned`);
-                await bot.telegram.banChatMember(chatId, tgId.toString(), {
-                    chat_id: chatId,
-                    revoke_messages: true
+                await bot.telegram.banChatMember(chatId.toString(), tgId.toString(), {
+                    revoke_messages: revoke_messages
                 })
-                
+
             } catch (error) {
                 console.log(error)
             }
         } else {
+            console.log("unban")
             try {
                 await bot.telegram.unbanChatMember(chatId.toString(), tgId.toString(), {
-                    chat_id: chatId,
                     only_if_banned: true
                 })
             } catch (error) {
@@ -122,9 +121,9 @@ GK.on("TransferSingle", async (operator, from, to, id, amount) => {
         } catch (error) {
             console.log(error)
         }
-       //  setAddressRights(id, chatId.toString(), from, false, true)
-       //  setAddressRights(id, chatId.toString(), to, false, true)
-    }, 5000);
+        setAddressRights(id, chatId.toString(), from, false, true)
+        setAddressRights(id, chatId.toString(), to, false, true)
+    }, 10000);
 })
 
 const createRoom = new Scenes.BaseScene("createRoom");
@@ -246,12 +245,12 @@ bot.on('message', async (ctx) => {
                         revoke_messages: true
                     })
                 } catch (error) {
-                    
+
                 }
-               
+
             }
         }
-      
+
     }
 })
 
