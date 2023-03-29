@@ -5,15 +5,11 @@ const { ethers } = require("ethers");
 
 require("dotenv").config();
 
-// const web3 = new ethers.providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc");
 
 const web3 = new ethers.providers.JsonRpcProvider(process.env.RPC);
-
 GK_ADDRESS = process.env.CONTRACT_ADDRESS;
 GK_ABI = require('./GATEKEEPER_ABI.json');
-
 const GK = new ethers.Contract(GK_ADDRESS, GK_ABI, web3);
-
 const gk_iface = new ethers.utils.Interface(GK_ABI);
 
 const bot = new Telegraf(process.env.TELEGRAM);
@@ -33,7 +29,8 @@ async function isUserRegister(userId) {
 }
 
 async function getRoom(chatId) {
-    return null;
+    let room = await GK.IdsOfRooms(chatId);
+    return parseInt(room.toString());
 }
 
 async function onGateKeep(ctx) {
@@ -43,8 +40,11 @@ async function onGateKeep(ctx) {
     const senderId = ctx.update.message.from.id;
     console.log(chatId, botId)
     let room = await getRoom(chatId);
-    if (room != null) {
-
+    if (room != 0) {
+        ctx.sendMessage(`
+        This channel is already gated.
+    `);
+    return;
     } else {
         let senderInfo = await ctx.getChatMember(senderId)
         if (!isTgAdmin(senderInfo)) {
@@ -140,7 +140,7 @@ createRoom.on(message("text"), async ctx => {
         await ctx.reply(`
         Ok, follow the following link and execute the transaction to register this channel with a starting supply of ${supply}.
         
-https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}`);
+https://arbitrum.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}`);
     } else {
         await ctx.reply(`
         this doesn't look like a valid number. Start again the process.`);
@@ -160,7 +160,7 @@ bot.start(async (ctx) => {
 Welcome to GateKeeper
 To link your address to your Telegram account, visit this link and send the transaction with the address you want to use:
 
-https://goerli.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
+https://arbitrum.ethcmd.com/int3nt?to=${GK_ADDRESS}&data=${data}
 
 By registering, you'll receive an NFT that will allow you to access the main Gate channel.
 
@@ -193,7 +193,7 @@ You have access to the following channels:
                     invite_link = chatInvite.invite_link;
                 }
                 try {
-                    channelList += (index + 1) + ". " + chatInfo.title + " - " + invite_link;
+                    channelList += (index + 1) + ". " + chatInfo.title + " - " + invite_link + "/n/n";
                 } catch (error) {
 
                 }
@@ -205,6 +205,8 @@ You have access to the following channels:
         You are registered with the address: ${address}.
 
         ${channelList}
+
+        You can also create your own channel by inviting the bot in a group you own and executing the /gatekeep command.
         `)
     }
 })
@@ -255,9 +257,3 @@ bot.on('message', async (ctx) => {
 })
 
 bot.startPolling()
-
-/*
-while (true) {
-    let groups = getGroups();
-}
-*/
