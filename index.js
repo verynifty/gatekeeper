@@ -188,10 +188,10 @@ You have access to the following channels:
                 console.log(chatId)
                 let chatInfo = await bot.telegram.getChat(chatId.toString())
                 let invite_link = chatInfo.invite_link;
-                if (invite_link == null) {
+               // if (invite_link == null) {
                     let chatInvite = await bot.telegram.createChatInviteLink(chatId.toString())
                     invite_link = chatInvite.invite_link;
-                }
+                //}
                 try {
                     channelList += (index + 1) + ". " + chatInfo.title + " - " + invite_link + "/n/n";
                 } catch (error) {
