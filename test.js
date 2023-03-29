@@ -20,7 +20,7 @@ const bot = new Telegraf(process.env.TELEGRAM);
 
 (async function() {
     let chatId = await GK.roomIds(1);
-    let infos = await bot.telegram.getChat(chatId.toString());
+    let infos = await bot.telegram.getChat(-1001593103753);
     let photo = await bot.telegram.getFileLink(infos.photo.big_file_id);
     console.log(photo);
     console.log({
