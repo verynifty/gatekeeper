@@ -6,7 +6,6 @@ const { ethers } = require("ethers");
 
 require("dotenv").config();
 
-// const web3 = new ethers.providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc");
 
 const web3 = new ethers.providers.JsonRpcProvider(process.env.RPC);
 
