@@ -24,7 +24,10 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   let chatId = await GK.roomIds(id);
   console.info(chatId)
-  let infos = await bot.telegram.getChat(chatId.toString());
+//  let infos = await bot.telegram.getChat(chatId.toString());
+  let infos = await bot.telegram.getChat( -1001593103753);
+
+ 
   console.info(infos)
   let photo = await bot.telegram.getFileLink(infos.photo.big_file_id);
   res.json({
