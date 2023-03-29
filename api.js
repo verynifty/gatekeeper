@@ -21,8 +21,14 @@ app.get('/:id', async (req, res) => {
     const { id } = req.params;
     // do something with the id
     let chatId = await GK.roomIds(id);
-    let chatInfo = await bot.telegram.getChat(chatId.toString())
-    res.json(chatInfo);
+    let infos = await bot.telegram.getChat(chatId.toString());
+    let photo = await bot.telegram.getFileLink(infos.photo.big_file_id);
+    console.log(photo);
+    console.log({
+        name: infos.title,
+        description: `The key to the telegram channel: ${infos.title}. Only holders of the NFT can access the group. Use @gatekeeper_muse_bot to join the group.`,
+        image: photo.href,
+    })
 };
 
 module.exports = app;
