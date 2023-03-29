@@ -66,10 +66,19 @@
        // accounts: [process.env.KEY],
        accounts: [process.env.KEY],
      },
+     arbitrum: {
+      url: "https://arb1.arbitrum.io/rpc",
+      accounts: [process.env.KEY],
+    },
+    arbitrumOne: {
+      url: "https://arb1.arbitrum.io/rpc",
+      accounts: [process.env.KEY],
+    }
    },
    etherscan: {
-     apiKey: process.env.ETHERSCAN,
-     url: "https://api.etherscan.com/",
+    apiKey:{
+      arbitrumOne: "",
+    },
    },
    solidity: {
      compilers: [

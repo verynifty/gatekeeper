@@ -4,6 +4,38 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/*
+
+
+                                  {} {}
+                          !  !  ! II II !  !  !
+                       !  I__I__I_II II_I__I__I  !
+                       I_/|__|__|_|| ||_|__|__|\_I
+                    ! /|_/|  |  | || || |  |  |\_|\ !
+        .--.        I//|  |  |  | || || |  |  |  |\\I        .--.
+       /-   \    ! /|/ |  |  |  | || || |  |  |  | \|\ !    /=   \
+       \=__ /    I//|  |  |  |  | || || |  |  |  |  |\\I    \-__ /
+        }  {  ! /|/ |  |  |  |  | || || |  |  |  |  | \|\ !  }  {
+       {____} I//|  |  |  |  |  | || || |  |  |  |  |  |\\I {____}
+ _!__!__|= |=/|/ |  |  |  |  |  | || || |  |  |  |  |  | \|\=|  |__!__!_
+ _I__I__|  ||/|__|__|__|__|__|__|_|| ||_|__|__|__|__|__|__|\||- |__I__I_
+ -|--|--|- ||-|--|--|--|--|--|--|-|| ||-|--|--|--|--|--|--|-||= |--|--|-
+  |  |  |  || |  |  |  |  |  |  | || || |  |  |  |  |  |  | ||  |  |  |
+  |  |  |= || |  |  |  |  |  |  | || || |  |  |  |  |  |  | ||= |  |  |
+  |  |  |- || |  |  |  |  |  |  | || || |  |  |  |  |  |  | ||= |  |  |
+  |  |  |- || |  |  |  |  |  |  | || || |  |  |  |  |  |  | ||- |  |  |
+ _|__|__|  ||_|__|__|__|__|__|__|_|| ||_|__|__|__|__|__|__|_||  |__|__|_
+ -|--|--|= ||-|--|--|--|--|--|--|-|| ||-|--|--|--|--|--|--|-||- |--|--|-
+  |  |  |- || |  |  |  |  |  |  | || || |  |  |  |  |  |  | ||= |  |  |
+ ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^~~~~~~~~~~~
+
+                    GateKeeper Beta - The gatekeeper of the chat
+
+                         @gatekeeper_muse_bot on Telegram
+
+                                
+
+*/
 contract GateKeeper is ERC1155, Ownable {
     mapping(uint128 => address) public roomOwners;
 
@@ -15,7 +47,7 @@ contract GateKeeper is ERC1155, Ownable {
 
     uint128 public nbRooms = 0;
 
-    constructor() ERC1155("https://ipfs.io/ipfs/QmWXJXRdExse2YHRY21Wvh4pjRxNRQcWVhcKw4DLVnqGqs/") {}
+    constructor() ERC1155("https://gatekeeper-verynifty.vercel.app/api/{id}") {}
 
     function createRoom(int128 _roomId, uint128 _supply) public {
         require(IdsOfRooms[_roomId] == 0);
