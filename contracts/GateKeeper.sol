@@ -84,4 +84,8 @@ contract GateKeeper is ERC1155, Ownable {
         return (this.balanceOf(addressOfUsers[_userId], IdsOfRooms[_chatId]) > 0 && addressOfUsers[_userId] != address(0));
     }
 
+     function setURI(string memory newuri) public onlyOwner {
+        _setURI(newuri);
+    }
+
 }
